@@ -1,5 +1,6 @@
 import { createContext, useRef, useEffect, useState } from "react";
 import { IActivityData } from "./Interfaces/types";
+import { activityBase } from "./utils/objects";
 
 export const appContext = createContext({
   activityData: {} as IActivityData,
@@ -27,13 +28,7 @@ const AppProvider = ({ children }: IProps) => {
   const sessionIdRef = useRef(""); // Create a ref for sessionId
 
   const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [activityData, setActivityData] = useState<IActivityData>({
-    session_id: "",
-    timestamp: "",
-    interval: 60,
-    message: "",
-    full_message: "",
-  });
+  const [activityData, setActivityData] = useState<IActivityData>(activityBase);
   const [activityList, setActivityList] = useState<IActivityData[]>([]);
   const [sessionStatus, setSessionStatus] = useState(false);
   const [sessionId, setSessionIdState] = useState("");
@@ -76,16 +71,18 @@ const AppProvider = ({ children }: IProps) => {
       };
 
       newSocket.onmessage = (event) => {
-        console.log("I want to be able to see that msg here");
-
-        // Parse the JSON string into an object
         const parsedData = JSON.parse(event.data);
 
-        if (parsedData.session_id === sessionIdRef.current) {
+        console.log(parsedData);
+
+        if (parsedData.type === "disconnect") {
+          setDataStatus(parsedData.message);
+          // Handle disconnection notification
+        } else if (parsedData.session_id === sessionIdRef.current) {
           setActivityData(parsedData);
           setDataStatus("Data is being monitored.");
         } else {
-          console.log("Wrong session ID");
+          setDataStatus("Wrong session ID");
         }
       };
     }

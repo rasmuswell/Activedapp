@@ -7,7 +7,6 @@ export const ActivityLogger = () => {
     useContext(appContext);
 
   useEffect(() => {
-    console.log("DATA", activityData);
     if (
       activityData.session_id !== "" &&
       !activityList.some((item) => item.timestamp === activityData.timestamp)

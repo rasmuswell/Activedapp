@@ -8,6 +8,7 @@ import { IconCopy } from "@tabler/icons-react";
 import { copyToClipboard } from "../utils/clipboard";
 import { generateSessionId } from "../utils/uuid";
 import { TerminateRecording } from "../Components/TerminateRecording";
+import { activityBase } from "../utils/objects";
 
 export const Record = () => {
   const {
@@ -17,6 +18,8 @@ export const Record = () => {
     setSessionId,
     dataStatus,
     setDataStatus,
+    setActivityData,
+    setActivityList,
   } = useContext(appContext);
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const [popupEnd, setPopupEnd] = useState(false);
@@ -42,6 +45,21 @@ export const Record = () => {
     e.preventDefault();
     setShowTerms(false);
     setShouldAnimate(false); // Trigger overaly animation
+  };
+
+  const handleConfirmTerminate = (e) => {
+    e.preventDefault();
+    setSessionStatus(false);
+    setSessionId("");
+    setDataStatus("Awaiting data input...");
+    setPopupEnd(false);
+    setActivityData(activityBase);
+    setActivityList([]);
+  };
+
+  const handleReturnTerminate = (e) => {
+    e.preventDefault();
+    setPopupEnd(false);
   };
 
   return (
@@ -91,13 +109,13 @@ export const Record = () => {
             <TerminateRecording dataStatus={dataStatus} />
             <div className="flex mt-[20px] gap-[10%] justify-center">
               <button
-                onClick={handleAcceptToS}
+                onClick={handleConfirmTerminate}
                 className={`border-[1px] border-[transparent] border-b-[white] p-2 transition duration-200 ease-in-out hover:border-[1px] hover:border-[white]  rounded-[2px] hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500`}
               >
                 Confirm
               </button>
               <button
-                onClick={handleDenyToS}
+                onClick={handleReturnTerminate}
                 className={`border-[1px] border-[transparent] border-b-[white] p-2 transition duration-200 ease-in-out hover:border-[1px] hover:border-[white]  rounded-[2px] hover:bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500`}
               >
                 Return
