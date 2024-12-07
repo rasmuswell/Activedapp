@@ -1,11 +1,11 @@
 export interface IActivityData {
-  session_id: string;
   timestamp: string;
-  interval: number;
-  message: string;
-  full_message: string;
+  sessionId: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  actions: number;
 }
 
-interface IActivityList {
+export interface IActivityList {
   activityList: [];
 }

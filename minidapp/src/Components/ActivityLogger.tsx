@@ -1,6 +1,6 @@
 import { useEffect, useContext } from "react";
-import { messageAPM, messageCPU } from "../utils/messageHelper";
 import { appContext } from "../AppContext";
+import { splitDate } from "../utils/helpers";
 
 export const ActivityLogger = () => {
   const { activityData, activityList, setActivityList } =
@@ -8,38 +8,41 @@ export const ActivityLogger = () => {
 
   useEffect(() => {
     if (
-      activityData.session_id !== "" &&
+      activityData.sessionId !== "" &&
       !activityList.some((item) => item.timestamp === activityData.timestamp)
     ) {
       setActivityList((prevData) => [...prevData, activityData]);
     }
   }, [activityData]);
 
-  const messageData = (data, message) => {
-    if (message === "Actions") {
-      return messageAPM(data);
-    }
-    if (message === "CPU") {
-      return messageCPU(data);
-    }
-  };
-
   return (
     <>
-      <div>
+      <div className="w-full">
         <h1>Activity Logger</h1>
         {/* Render the activity data */}
-        <div className="h-[500px] overflow-y-scroll">
-          <ul>
-            {[...activityList].reverse().map((data, index) => (
-              <li key={index}>
-                {data.timestamp} ({`Actions: `}
-                {messageData(data.message, "Actions")}, {`CPU Usage: `}
-                {messageData(data.message, "CPU")}
-                {data["CPU Usage"]})
-              </li>
-            ))}
-          </ul>
+        <div className="flex h-[500px] overflow-y-hidden w-1/2">
+          <table className="flex flex-col w-full ">
+            <thead>
+              <tr className="flex gap-5 w-full no-wrap whitespace-nowrap">
+                <th className="w-1/5">Date</th>
+                <th className="w-1/5">Time</th>
+                <th className="w-1/5">CPU usage:</th>
+                <th className="w-1/5">Memory usage:</th>
+                <th className="w-1/5">Actions:</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...activityList].reverse().map((data, index) => (
+                <tr key={index} className="flex gap-5 w-full no-wrap">
+                  <td className="w-1/5">{splitDate("date", data.timestamp)}</td>
+                  <td className="w-1/5">{splitDate("time", data.timestamp)}</td>
+                  <td className="w-1/5">{data.cpuUsage}</td>
+                  <td className="w-1/5">{data.memoryUsage.toFixed(0)}</td>
+                  <td className="w-1/5">{data.actions.toFixed(0)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </>

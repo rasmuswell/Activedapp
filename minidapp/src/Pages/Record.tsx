@@ -9,6 +9,7 @@ import { copyToClipboard } from "../utils/clipboard";
 import { generateSessionId } from "../utils/uuid";
 import { TerminateRecording } from "../Components/TerminateRecording";
 import { activityBase } from "../utils/objects";
+import { nodejsWebsocket } from "../utils/websocket";
 
 export const Record = () => {
   const {
@@ -20,6 +21,10 @@ export const Record = () => {
     setDataStatus,
     setActivityData,
     setActivityList,
+    showSummary,
+    setShowSummary,
+    pendingUid,
+    setPendingUid,
   } = useContext(appContext);
   const [shouldAnimate, setShouldAnimate] = useState(false);
   const [popupEnd, setPopupEnd] = useState(false);
@@ -32,13 +37,13 @@ export const Record = () => {
     setShouldAnimate(true); // Trigger overlay animation
   };
 
-  const handleAcceptToS = (e) => {
+  const handleAcceptToS = async (e) => {
     e.preventDefault();
     setShowTerms(false);
     setSessionStatus(true);
-    const transformedId = generateSessionId();
+    const transformedId = await generateSessionId();
     setSessionId(transformedId);
-    setDataStatus("Awaiting data input...");
+    nodejsWebsocket("start", transformedId, setDataStatus, setActivityData);
   };
 
   const handleDenyToS = (e) => {
@@ -49,17 +54,30 @@ export const Record = () => {
 
   const handleConfirmTerminate = (e) => {
     e.preventDefault();
-    setSessionStatus(false);
-    setSessionId("");
-    setDataStatus("Awaiting data input...");
+    setShowSummary(true);
     setPopupEnd(false);
-    setActivityData(activityBase);
-    setActivityList([]);
+    nodejsWebsocket(
+      "stop",
+      sessionId,
+      setDataStatus,
+      setActivityData,
+      setPendingUid
+    );
   };
 
   const handleReturnTerminate = (e) => {
     e.preventDefault();
     setPopupEnd(false);
+  };
+
+  const exitSummary = (e) => {
+    e.preventDefault();
+    setShowSummary(false);
+    setSessionStatus(false);
+    setActivityData(activityBase);
+    setSessionId("");
+    setDataStatus("");
+    setActivityList([]);
   };
 
   return (
@@ -155,18 +173,29 @@ export const Record = () => {
                 <Status set={"Blockchain"} msg={"Not implemented yet"} />
               </div>
 
-              <div className="relative">
+              <div className="relative w-full">
                 <ActivityLogger />
               </div>
             </section>
-            <div className="flex w-full justify-end p-4">
-              <button
-                onClick={() => setPopupEnd(true)}
-                className="z-20 p-2 border-[1px] bg-[red]/20 hover:bg-[red]/80"
-              >
-                End session
-              </button>
-            </div>
+            {!showSummary ? (
+              <div className="flex w-full justify-end p-4">
+                <button
+                  onClick={() => setPopupEnd(true)}
+                  className="z-20 p-2 border-[1px] bg-[red]/20 hover:bg-[red]/80"
+                >
+                  End session
+                </button>
+              </div>
+            ) : (
+              <div className="flex w-full justify-end p-4">
+                <button
+                  onClick={exitSummary}
+                  className="z-20 p-2 border-[1px] bg-[red]/20 hover:bg-[red]/80"
+                >
+                  Exit summary
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>

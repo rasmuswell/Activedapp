@@ -1,7 +1,7 @@
 export const activityBase = {
-  session_id: "",
   timestamp: "",
-  interval: 60,
-  message: "",
-  full_message: "",
+  sessionId: "",
+  cpuUsage: 0,
+  memoryUsage: 0,
+  actions: 0,
 };

@@ -1,6 +1,7 @@
 import { createContext, useRef, useEffect, useState } from "react";
 import { IActivityData } from "./Interfaces/types";
 import { activityBase } from "./utils/objects";
+import { checkmode } from "./services/minima";
 
 export const appContext = createContext({
   activityData: {} as IActivityData,
@@ -17,6 +18,10 @@ export const appContext = createContext({
   setActivityList: (() => {}) as React.Dispatch<
     React.SetStateAction<IActivityData[]>
   >,
+  showSummary: false,
+  setShowSummary: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
+  pendingUid: 0,
+  setPendingUid: (() => {}) as React.Dispatch<React.SetStateAction<number>>,
 });
 
 interface IProps {
@@ -27,12 +32,13 @@ const AppProvider = ({ children }: IProps) => {
   const loaded = useRef(false);
   const sessionIdRef = useRef(""); // Create a ref for sessionId
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [activityData, setActivityData] = useState<IActivityData>(activityBase);
   const [activityList, setActivityList] = useState<IActivityData[]>([]);
   const [sessionStatus, setSessionStatus] = useState(false);
   const [sessionId, setSessionIdState] = useState("");
   const [dataStatus, setDataStatus] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
+  const [pendingUid, setPendingUid] = useState(0);
 
   // Update the ref whenever sessionId changes
   const setSessionId = (id: string) => {
@@ -46,54 +52,11 @@ const AppProvider = ({ children }: IProps) => {
       (window as any).MDS.init((msg: any) => {
         if (msg.event === "inited") {
           // do something Minim-y
+          checkmode();
         }
       });
     }
   }, [loaded]);
-
-  useEffect(() => {
-    if (sessionId !== "") {
-      connect();
-    }
-    // Establish WebSocket connection with reconnection
-    function connect() {
-      const newSocket = new WebSocket("ws://localhost:8765");
-
-      newSocket.onopen = () => {
-        console.log("WebSocket connected");
-        setSocket(newSocket);
-      };
-
-      newSocket.onclose = () => {
-        console.log("WebSocket disconnected. Reconnecting...");
-        // Attempt to reconnect after 3 seconds
-        setTimeout(connect, 3000);
-      };
-
-      newSocket.onmessage = (event) => {
-        const parsedData = JSON.parse(event.data);
-
-        console.log(parsedData);
-
-        if (parsedData.type === "disconnect") {
-          setDataStatus(parsedData.message);
-          // Handle disconnection notification
-        } else if (parsedData.session_id === sessionIdRef.current) {
-          setActivityData(parsedData);
-          setDataStatus("Data is being monitored.");
-        } else {
-          setDataStatus("Wrong session ID");
-        }
-      };
-    }
-
-    // Cleanup function
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [sessionId]);
 
   return (
     <appContext.Provider
@@ -108,6 +71,10 @@ const AppProvider = ({ children }: IProps) => {
         setDataStatus,
         activityList,
         setActivityList,
+        showSummary,
+        setShowSummary,
+        pendingUid,
+        setPendingUid,
       }}
     >
       {children}
