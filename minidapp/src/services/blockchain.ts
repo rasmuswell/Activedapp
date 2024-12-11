@@ -17,9 +17,10 @@ export const sendFullToBlockchain = async (sessionId, setPendingUid) => {
 
   //Hash data
   const hashedData = await hashData(fileData);
-  console.log(hashedData);
 
   //Send transaction with hashed data
   const response = await sendData(hashedData);
-  setPendingUid(response.peninguid);
+
+  setPendingUid(response.pendinguid);
+  console.log(response.pendinguid);
 };

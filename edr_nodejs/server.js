@@ -1,6 +1,7 @@
 const WebSocket = require("ws");
 const os = require("os");
 const { GlobalKeyboardListener } = require("node-global-key-listener");
+const { log } = require("console");
 
 // Set up WebSocket server
 const wss = new WebSocket.Server({ port: 8765 });

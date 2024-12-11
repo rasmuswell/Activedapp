@@ -1,5 +1,8 @@
 import { IActivityData } from "../Interfaces/types";
-import { sendFullToBlockchain, sendToBlockchain } from "../services/blockchain";
+import {
+  sendFullToBlockchain,
+  // sendToBlockchain
+} from "../services/blockchain";
 import { saveDataToFile } from "./fileHandler";
 
 let socket: WebSocket | null = null;
@@ -11,7 +14,7 @@ export const nodejsWebsocket = (
   sessionId: string,
   setDataStatus: (status: string) => void,
   setActivityData: (data: IActivityData) => void, // Update type to match IActivityData
-  setPendingUid: number
+  setPendingUid?: (number: number) => void
 ) => {
   const retryDelay = 5000;
 
@@ -53,7 +56,6 @@ export const nodejsWebsocket = (
       if (data) {
         setDataStatus("Reading data from server.");
         setActivityData(data);
-        //Save data to file
         saveDataToFile(sessionId, data);
       }
     };
@@ -65,10 +67,7 @@ export const nodejsWebsocket = (
       }
 
       if (hasConnectedOnce) {
-        console.log("Disconnected from the WebSocket server");
         setDataStatus("Disconnected from the WebSocket server");
-
-        // Retry connection
         retryConnection();
       }
     };

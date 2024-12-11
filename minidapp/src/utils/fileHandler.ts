@@ -33,8 +33,8 @@ const createPacketSizedData = (data) => {
 
   // Add a delimiter
   const packet = jsonString + "$$$";
-  const packetSize = new TextEncoder().encode(packet).length;
 
-  console.log("Packet Data:", packetSize);
+  // const packetSize = new TextEncoder().encode(packet).length;
+  // console.log("Packet Data:", packetSize);
   return packet;
 };

@@ -1,17 +1,31 @@
-import { blockchainAdress, blockchainAmount } from "../utils/config";
+import {
+  blockchainAdress,
+  blockchainAmount,
+  stateNumber,
+} from "../utils/config";
 
 const MDS = (window as any).MDS;
 
 export const checkmode = () => {
-  console.log("abc");
   return new Promise((resolve, reject) => {
     MDS.cmd("checkmode", function (res) {
-      console.log(res);
-
       if (res.status) {
-        console.log("MiniDapp mode:", res.response.mode);
-        console.log("Write mode:", res.response.writemode);
+        // console.log("MiniDapp mode:", res.response.mode);
+        // console.log("Write mode:", res.response.writemode);
         resolve(res);
+      }
+    });
+  });
+};
+
+export const checkStatus = () => {
+  return new Promise((resolve, reject) => {
+    MDS.cmd("status", function (res) {
+      if (res.status) {
+        // console.log("MiniDapp mode:", res.response.chain.time);
+        resolve(res.response.chain.time);
+      } else {
+        console.log("Error");
       }
     });
   });
@@ -21,8 +35,8 @@ export const saveToMDSFile = (filename, data) => {
   return new Promise((resolve, reject) => {
     MDS.file.save(filename, data, function (response) {
       if (response.status) {
-        console.log("File saved successfully!");
-        console.log("Saved to:", response.response.file);
+        // console.log("File saved successfully!");
+        // console.log("Saved to:", response.response.file);
       } else {
         console.error("Error saving file:", response.error);
       }
@@ -45,9 +59,11 @@ export const readFile = (filename) => {
   });
 };
 
-export const sendData = (hash) => {
+export const sendData = (hash): Promise<ITransactionResponse> => {
+  console.log("HASH SENT:", hash);
+
   const state = {
-    33: hash,
+    99: hash,
   };
   return new Promise((resolve, reject) => {
     MDS.cmd(
@@ -61,6 +77,40 @@ export const sendData = (hash) => {
         resolve(res);
       }
     );
+  });
+};
+
+export const listenPendingTxn = (setBlockChainStatus, pendingUid) => {
+  return new Promise((resolve, reject) => {
+    MDS.init((msg) => {
+      if (msg.event == "MDS_PENDING") {
+        // Extract relevant information
+        console.log(msg);
+
+        // const pending = msg.data.result.pending;
+        const pendinguid = msg.data.uid;
+
+        if (pendinguid === pendingUid) {
+          setBlockChainStatus(
+            "Transaction has been sent. You can now exit the session."
+          );
+          resolve("confirmation");
+        }
+        // const status = msg.data.status;
+        // let coinid;
+        // if (msg.data?.result?.response?.body?.txn?.outputs?.length > 0) {
+        //   coinid = msg.data.result.response.body.txn.outputs[0].coinid;
+        // }
+
+        // // Process the pending transaction
+        // const pendingRes = processPendingTransaction(
+        //   pending,
+        //   pendinguid,
+        //   status,
+        //   coinid
+        // );
+      }
+    });
   });
 };
 

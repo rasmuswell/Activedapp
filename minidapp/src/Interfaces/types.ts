@@ -1,7 +1,7 @@
 export interface IActivityData {
   timestamp: string;
   sessionId: string;
-  cpuUsage: number;
+  cpuUsage: string;
   memoryUsage: number;
   actions: number;
 }
