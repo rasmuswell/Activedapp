@@ -15,21 +15,11 @@ async def handle_client(websocket, path=None):
             for client in connected_clients:
                 if client != websocket:
                     await client.send(message)
-    except websockets.exceptions.ConnectionClosed as e:
-        print(f"Client connection closed: {e.code}, {e.reason}")
-        # Notify other clients about disconnection
-        disconnect_message = json.dumps({
-            "type": "disconnect",
-            "message": "Collecting tool closed."
-        })
-        await asyncio.gather(
-            *[client.send(disconnect_message) for client in connected_clients if client != websocket],
-            return_exceptions=True
-        )
+    except websockets.exceptions.ConnectionClosed:
+        print("Client connection closed")
     finally:
         # Remove the client when connection is closed
         connected_clients.remove(websocket)
-        print(f"Client removed. Remaining clients: {len(connected_clients)}")
 
 async def main():
     # Create WebSocket server with the updated handler

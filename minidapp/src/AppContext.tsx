@@ -1,6 +1,7 @@
 import { createContext, useRef, useEffect, useState } from "react";
 import { IActivityData } from "./Interfaces/types";
 import { activityBase } from "./utils/objects";
+import { checkmode, checkStatus } from "./services/minima";
 
 export const appContext = createContext({
   activityData: {} as IActivityData,
@@ -11,12 +12,26 @@ export const appContext = createContext({
   setSessionStatus: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
   sessionId: "",
   setSessionId: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  reviewId: "",
+  setReviewId: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
   dataStatus: "",
   setDataStatus: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  blockChainStatus: "",
+  setBlockChainStatus: (() => {}) as React.Dispatch<
+    React.SetStateAction<string>
+  >,
   activityList: [] as IActivityData[],
   setActivityList: (() => {}) as React.Dispatch<
     React.SetStateAction<IActivityData[]>
   >,
+  showSummary: false,
+  setShowSummary: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
+  pendingUid: 0,
+  setPendingUid: (() => {}) as React.Dispatch<React.SetStateAction<number>>,
+  timeConnected: "",
+  setTimeConnected: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  fileData: "",
+  setFileData: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
 });
 
 interface IProps {
@@ -27,12 +42,17 @@ const AppProvider = ({ children }: IProps) => {
   const loaded = useRef(false);
   const sessionIdRef = useRef(""); // Create a ref for sessionId
 
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [activityData, setActivityData] = useState<IActivityData>(activityBase);
   const [activityList, setActivityList] = useState<IActivityData[]>([]);
   const [sessionStatus, setSessionStatus] = useState(false);
   const [sessionId, setSessionIdState] = useState("");
+  const [reviewId, setReviewId] = useState("");
   const [dataStatus, setDataStatus] = useState("");
+  const [blockChainStatus, setBlockChainStatus] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
+  const [pendingUid, setPendingUid] = useState(0);
+  const [timeConnected, setTimeConnected] = useState("");
+  const [fileData, setFileData] = useState<IActivityData>("");
 
   // Update the ref whenever sessionId changes
   const setSessionId = (id: string) => {
@@ -46,54 +66,31 @@ const AppProvider = ({ children }: IProps) => {
       (window as any).MDS.init((msg: any) => {
         if (msg.event === "inited") {
           // do something Minim-y
+          checkmode();
         }
       });
     }
   }, [loaded]);
 
   useEffect(() => {
-    if (sessionId !== "") {
-      connect();
+    if (blockChainStatus === "") {
+      const runCmds = async () => {
+        const time = await checkStatus();
+        setTimeConnected(time);
+        setBlockChainStatus(`Connection established at ${time}`);
+      };
+      runCmds();
     }
-    // Establish WebSocket connection with reconnection
-    function connect() {
-      const newSocket = new WebSocket("ws://localhost:8765");
+  }, []);
 
-      newSocket.onopen = () => {
-        console.log("WebSocket connected");
-        setSocket(newSocket);
-      };
-
-      newSocket.onclose = () => {
-        console.log("WebSocket disconnected. Reconnecting...");
-        // Attempt to reconnect after 3 seconds
-        setTimeout(connect, 3000);
-      };
-
-      newSocket.onmessage = (event) => {
-        const parsedData = JSON.parse(event.data);
-
-        console.log(parsedData);
-
-        if (parsedData.type === "disconnect") {
-          setDataStatus(parsedData.message);
-          // Handle disconnection notification
-        } else if (parsedData.session_id === sessionIdRef.current) {
-          setActivityData(parsedData);
-          setDataStatus("Data is being monitored.");
-        } else {
-          setDataStatus("Wrong session ID");
-        }
-      };
+  useEffect(() => {
+    if (
+      activityData.sessionId !== "" &&
+      !activityList.some((item) => item.timestamp === activityData.timestamp)
+    ) {
+      setActivityList((prevData) => [...prevData, activityData]);
     }
-
-    // Cleanup function
-    return () => {
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [sessionId]);
+  }, [activityData]);
 
   return (
     <appContext.Provider
@@ -104,10 +101,21 @@ const AppProvider = ({ children }: IProps) => {
         setSessionStatus,
         sessionId,
         setSessionId,
+        reviewId,
+        setReviewId,
+        fileData,
+        setFileData,
         dataStatus,
         setDataStatus,
+        blockChainStatus,
+        setBlockChainStatus,
         activityList,
         setActivityList,
+        showSummary,
+        setShowSummary,
+        pendingUid,
+        setPendingUid,
+        timeConnected,
       }}
     >
       {children}

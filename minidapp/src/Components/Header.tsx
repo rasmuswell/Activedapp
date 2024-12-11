@@ -18,7 +18,7 @@ export const Header = () => {
   const isActive = (path: string) => location.pathname === path; //TODO: White underline for active page / change color
 
   return (
-    <header className="h-[64px] px-4 bg-[black] flex justify-between items-center text-[gray]">
+    <header className="h-[64px] px-4 bg-[black] flex justify-between items-center text-[gray] z-30">
       <div className="flex items-center text-[white]">
         <Link to={`/`} className="flex cursor-pointer gap-[5px]">
           {/* <img src={V_Logo_white} className="w-[32px] h-[32px]"></img> */}

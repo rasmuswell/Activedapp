@@ -10,7 +10,7 @@ import logging
 import os
 
 # Configure session-ID
-session_id = "3bffc5f79cbe46de97d6a66b0cab3374"
+session_id = "58b6d41c149d460f8b5d9d0b02dbfead"
 
 # Ensure the data directory exists
 data_dir = os.path.join(os.path.dirname(__file__), "../data")
@@ -73,29 +73,16 @@ class WebSocketLogger:
 websocket_logger = WebSocketLogger(WEBSOCKET_SERVER)
 
 # Function to log with dynamic padding
-def log_with_dynamic_padding(message):
+def log_with_dynamic_padding(actions, cpu):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    full_message = f"{timestamp} - {message}"
-
-    current_size = len(full_message.encode('utf-8'))
-
-    if current_size < TARGET_BYTE_SIZE:
-        padding_size = TARGET_BYTE_SIZE - current_size
-        padding = ' ' * padding_size
-        full_message += padding
-
-    full_message += "$$$"
-
-    # Log to file
-    logging.info(full_message)
 
     # Prepare WebSocket message
     websocket_message = {
         "session_id": session_id,
         "timestamp": timestamp,
         "interval": interval,
-        "message": message,
-        "full_message": full_message
+        "actions": actions,
+        "cpu usage": cpu,
     }
 
     # Send to WebSocket in a separate thread
@@ -157,7 +144,7 @@ def monitor_resources():
             cpu_usage = psutil.cpu_percent(interval=None)
             log_message = f"Actions: {total_actions}, CPU Usage: {cpu_usage}%"
             print(log_message)
-            log_with_dynamic_padding(log_message)
+            log_with_dynamic_padding(total_actions, cpu_usage)
             keystrokes = 0
             mouse_clicks = 0
 
