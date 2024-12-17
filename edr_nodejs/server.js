@@ -1,7 +1,7 @@
 const WebSocket = require("ws");
 const os = require("os");
 const { GlobalKeyboardListener } = require("node-global-key-listener");
-const { log } = require("console");
+const { insertDataToDB } = require("./mysql");
 
 // Set up WebSocket server
 const wss = new WebSocket.Server({ port: 8765 });
@@ -26,7 +26,6 @@ actionListener.addListener((e) => {
   if (e.state === "DOWN") {
     if (!pressedKeys.has(e.name)) {
       actions++;
-      console.log(`Action detected! Total actions: ${actions}`);
     }
     pressedKeys.add(e.name); // Add the key to the set
   } else if (e.state === "UP") {
@@ -84,13 +83,38 @@ function collectData() {
 }
 
 // Broadcast data to all connected clients
-function broadcastData(data) {
-  const message = JSON.stringify(data);
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
-    }
-  });
+function broadcastData(type, data) {
+  // console.log("TYPE:", type);
+
+  if (type === "data") {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "message",
+            message: {
+              data, // Use the passed `data` parameter
+            },
+          })
+        );
+      }
+    });
+  }
+
+  if (type === "uid") {
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "uid",
+            data: {
+              data, // Extra nesting
+            },
+          })
+        );
+      }
+    });
+  }
 }
 
 // Handle new client connections
@@ -99,11 +123,19 @@ wss.on("connection", (ws) => {
   actions = 0;
 
   // Listen for messages from the client
-  ws.on("message", (message) => {
-    console.log(`Received message from client: ${message}`);
+  ws.on("message", async (message) => {
+    // console.log(`Received message from client: ${message}`);
+    let uid = "";
 
     try {
       const command = JSON.parse(message);
+      // console.log("command", command);
+
+      if (command.type === "mysql") {
+        const response = await insertDataToDB(command.data);
+        console.log("response: ", response);
+        broadcastData("uid", response);
+      }
 
       if (command.type === "start") {
         if (!isCollecting) {
@@ -114,7 +146,7 @@ wss.on("connection", (ws) => {
 
           intervalHandle = setInterval(() => {
             const data = collectData();
-            broadcastData(data);
+            broadcastData("data", data);
             actions = 0;
           }, interval);
         }
@@ -129,14 +161,6 @@ wss.on("connection", (ws) => {
     } catch (err) {
       console.error("Error processing message:", err);
     }
-  });
-
-  // Listen for messages from the client
-  ws.on("message", (message) => {
-    console.log(`Received message from client: ${message}`);
-
-    // Send a response back to the client
-    // broadcastData(`Server received: "${message}"`);
   });
 
   // Clean up when the client disconnects

@@ -1,14 +1,14 @@
 import { hashData, readFile, sendData } from "./minima";
+import { sendToTimeStamp } from "./timestamp";
 
 //Veritas app have to be able to handle offset and packet size of this partial data to be able to verify the hash.
 export const sendPartialToBlockchain = async (data) => {
   //Hash data
   const hashedData = await hashData(data);
-  console.log(hashedData);
+  // console.log(hashedData);
 
   //Send transaction with hashed data
-  const response = await sendData(hashedData);
-  console.log(response);
+  sendToTimeStamp(hashedData);
 };
 
 export const sendFullToBlockchain = async (sessionId, setPendingUid) => {

@@ -4,10 +4,11 @@ import { TARGET_BYTE_SIZE } from "./config";
 
 const dataArray: string[] = [];
 
-export const saveDataToFile = async (sessionId, data) => {
+export const formatData = async (sessionId, data) => {
   const filename = `${sessionId}.md`;
   //Create data with custom packet size
   const packetData = createPacketSizedData(data);
+  sendPartialToBlockchain(packetData);
   dataArray.push(packetData);
   //   const dataToFile = JSON.stringify(dataArray);
 

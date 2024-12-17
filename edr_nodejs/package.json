@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "mysql2": "^3.11.5",
     "node-global-key-listener": "^0.3.0",
     "os": "^0.1.2",
     "ws": "^8.18.0"

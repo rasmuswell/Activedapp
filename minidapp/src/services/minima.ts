@@ -125,7 +125,7 @@ export const hashData = (data): Promise<IDataHash> => {
 
     MDS.cmd(`hash data:${data}`, (res) => {
       if (res) {
-        console.log(res);
+        // console.log(res);
 
         resolve(res.response.hash);
       } else {

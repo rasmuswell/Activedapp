@@ -1,3 +1,0 @@
-pynput
-psutil
-websockets

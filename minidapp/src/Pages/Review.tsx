@@ -28,7 +28,7 @@ export const Review = () => {
     }
   };
 
-  const handleReadFile = (file: File): Promise<ArrayBuffer> => {
+  const handleReadFile = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       if (!(file instanceof Blob)) {
         return reject(new Error("Invalid file type"));
@@ -38,7 +38,7 @@ export const Review = () => {
 
       fileReader.onloadend = () => {
         if (fileReader.result) {
-          resolve(fileReader.result as ArrayBuffer);
+          resolve(fileReader.result as string);
         } else {
           reject(new Error("File could not be read"));
         }

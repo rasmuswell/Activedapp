@@ -13,6 +13,7 @@ import { Record } from "./Pages/Record.tsx";
 import { Monitor } from "./Pages/Monitor.tsx";
 import { Review } from "./Pages/Review.tsx";
 import { NotFound } from "./Pages/NotFound.tsx";
+import { Timestamp } from "./Pages/Timestamp.tsx";
 
 const router = createHashRouter(
   createRoutesFromElements(
@@ -20,6 +21,7 @@ const router = createHashRouter(
       <Route index element={<Record />} path={"/"} />
       <Route path="/monitor" element={<Monitor />} />
       <Route path="/review" element={<Review />} />
+      <Route path="/timestamp" element={<Timestamp />} />
       <Route path="/*" element={<NotFound />} />
     </Route>
   )
