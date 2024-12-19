@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { getWebSocket, initWebSocket } from "../services/websocketClient";
+import { useContext, useEffect, useState } from "react";
+import { initWebSocket } from "../services/websocketClient";
 import { appContext } from "../AppContext";
 
 export const Timestamp = () => {

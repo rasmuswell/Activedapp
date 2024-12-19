@@ -32,7 +32,7 @@ export const nodejsWebsocket = (
   const connect = () => {
     if (!shouldReconnect) return;
 
-    const socket = initWebSocket(handleMessage);
+    const socket: WebSocket = initWebSocket(handleMessage);
 
     socket.onopen = () => {
       console.log("Connected to the WebSocket server");

@@ -1,6 +1,10 @@
-let socket = null;
+import { IActivityData } from "../Interfaces/types";
 
-export const initWebSocket = (onMessage) => {
+let socket: WebSocket | null = null;
+
+export const initWebSocket = (
+  onMessage: (type: string, data: IActivityData) => void
+): WebSocket => {
   if (socket && socket.readyState !== WebSocket.CLOSED) {
     console.log("WebSocket already initialized.");
     return socket;
@@ -36,13 +40,6 @@ export const initWebSocket = (onMessage) => {
       console.error("Error parsing message:", err);
     }
   };
-
-  // socket.onmessage = (event) => {
-  //   console.log(event);
-
-  //   const data = JSON.parse(event.data);
-  //   onMessage(data);
-  // };
 
   socket.onclose = () => {
     console.log("WebSocket closed.");
