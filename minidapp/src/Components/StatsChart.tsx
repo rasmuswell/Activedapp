@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { StatsChartProps } from "../Interfaces/types";
 
 // Register required Chart.js components
 ChartJS.register(
@@ -21,18 +22,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-interface DataPoint {
-  timestamp: string;
-  sessionId: string;
-  cpuUsage: string;
-  memoryUsage: number;
-  actions: number;
-}
-
-interface StatsChartProps {
-  data: DataPoint[];
-}
 
 const StatsChart: React.FC<StatsChartProps> = ({ data }) => {
   const labels = data.map((item) => new Date(item.timestamp).toLocaleString());

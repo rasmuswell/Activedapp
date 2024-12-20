@@ -1,13 +1,9 @@
-import {
-  blockchainAdress,
-  blockchainAmount,
-  stateNumber,
-} from "../utils/config";
+import { blockchainAdress, blockchainAmount } from "../utils/config";
 
 const MDS = (window as any).MDS;
 
 export const checkmode = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     MDS.cmd("checkmode", function (res) {
       if (res.status) {
         // console.log("MiniDapp mode:", res.response.mode);
@@ -18,8 +14,8 @@ export const checkmode = () => {
   });
 };
 
-export const checkStatus = () => {
-  return new Promise((resolve, reject) => {
+export const checkStatus = (): Promise<string> => {
+  return new Promise((resolve) => {
     MDS.cmd("status", function (res) {
       if (res.status) {
         // console.log("MiniDapp mode:", res.response.chain.time);
@@ -32,7 +28,7 @@ export const checkStatus = () => {
 };
 
 export const saveToMDSFile = (filename, data) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(() => {
     MDS.file.save(filename, data, function (response) {
       if (response.status) {
         // console.log("File saved successfully!");
@@ -46,7 +42,7 @@ export const saveToMDSFile = (filename, data) => {
 
 export const readFile = (filename) => {
   const fileName = filename + ".md";
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     MDS.file.load(fileName, function (res) {
       console.log(res);
 
@@ -65,7 +61,7 @@ export const sendData = (hash): Promise<ITransactionResponse> => {
   const state = {
     99: hash,
   };
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     MDS.cmd(
       `send address:${blockchainAdress} amount:${blockchainAmount} state:${JSON.stringify(
         state
@@ -81,7 +77,7 @@ export const sendData = (hash): Promise<ITransactionResponse> => {
 };
 
 export const listenPendingTxn = (setBlockChainStatus, pendingUid) => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     MDS.init((msg) => {
       if (msg.event == "MDS_PENDING") {
         // Extract relevant information

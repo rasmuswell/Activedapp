@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { ActivityLogger } from "../Components/ActivityLogger";
 import recordImg from "../assets/record.jpg";
 import { appContext } from "../AppContext";
@@ -23,9 +23,7 @@ export const Record = () => {
     setActivityList,
     showSummary,
     setShowSummary,
-    pendingUid,
     setPendingUid,
-    timeConnected,
     blockChainStatus,
     setBlockChainStatus,
   } = useContext(appContext);

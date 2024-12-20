@@ -22,7 +22,7 @@ export const ActivityLogger = () => {
           {activityList.length > 0 && (
             <>
               {["Date", "Time (UTC)", "CPU (%)", "Memory (GB)", "Actions"].map(
-                (label, index) => {
+                (label) => {
                   const value = (() => {
                     const lastItem = activityList[activityList.length - 1];
                     switch (label) {

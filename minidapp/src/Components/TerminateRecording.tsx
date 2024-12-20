@@ -1,5 +1,3 @@
-import React from "react";
-
 export const TerminateRecording = ({ dataStatus }) => {
   return (
     <div className="text-gray-400">

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { appContext } from "../AppContext";
 import { listenPendingTxn } from "../services/minima";
 

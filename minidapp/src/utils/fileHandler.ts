@@ -1,4 +1,3 @@
-import { sendPartialToBlockchain } from "../services/blockchain";
 import { saveToMDSFile } from "../services/minima";
 import { TARGET_BYTE_SIZE } from "./config";
 

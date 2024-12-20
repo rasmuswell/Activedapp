@@ -3,12 +3,13 @@ import reviewImg from "../assets/review.jpg";
 import { appContext } from "../AppContext";
 import StatsChart from "../Components/StatsChart";
 import { splitDate } from "../utils/helpers";
+import { DataPoint } from "../Interfaces/types";
 
 export const Review = () => {
   const { reviewId, setReviewId, fileData, setFileData } =
     useContext(appContext);
 
-  const [reviewData, setReviewData] = useState([""]);
+  const [reviewData, setReviewData] = useState<DataPoint[]>([]);
 
   const handleSelectFile = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -52,35 +53,37 @@ export const Review = () => {
   };
 
   useEffect(() => {
-    const parseData = (input: string) => {
+    const parseData = (input: string | ArrayBuffer) => {
       // Split the input by the padding separator
-      const entries = input.split(/_+\$\$\$,/);
+      if (typeof input === "string") {
+        const entries = input.split(/_+\$\$\$,/);
 
-      // Remove padding from each entry
-      const cleanEntries = entries.map((entry) =>
-        entry.replace(/_+\$\$\$/, "").trim()
-      );
+        // Remove padding from each entry
+        const cleanEntries = entries.map((entry) =>
+          entry.replace(/_+\$\$\$/, "").trim()
+        );
 
-      // Parse each cleaned entry into a JSON object
-      const dataArray = cleanEntries
-        .filter((entry) => entry !== "") // Remove empty strings
-        .map((entry) => {
-          try {
-            return JSON.parse(entry);
-          } catch (error) {
-            console.error("Invalid JSON:", entry);
-            return null;
-          }
-        })
-        .filter((item) => item !== null); // Remove null entries
+        // Parse each cleaned entry into a JSON object
+        const dataArray = cleanEntries
+          .filter((entry) => entry !== "") // Remove empty strings
+          .map((entry) => {
+            try {
+              return JSON.parse(entry);
+            } catch (error) {
+              console.error("Invalid JSON:", entry);
+              return null;
+            }
+          })
+          .filter((item) => item !== null); // Remove null entries
 
-      return dataArray;
+        return dataArray;
+      } else {
+        return [""];
+      }
     };
     const cleanedData = parseData(fileData);
     setReviewData(cleanedData);
   }, [fileData]);
-
-  console.log(reviewData.length);
 
   return (
     <main className="flex min-h-[calc(100vh-64px)] items-center justify-center text-white">
@@ -114,7 +117,7 @@ export const Review = () => {
           <div className="bg-black/50 w-[110vw] min-h-[80vh] fixed z-10  "></div>
         )}
         {/* COMPONENTS */}
-        {reviewId !== "" && reviewData.length > 0 && reviewData[0] !== "" && (
+        {reviewId !== "" && reviewData.length > 0 && (
           <div className="flex flex-col z-20 gap-20 my-[30px]">
             <div className="relative w-[80vw]">
               <StatsChart data={reviewData} />

@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Termsofservice = () => {
   return (
     <div className="text-gray-400">

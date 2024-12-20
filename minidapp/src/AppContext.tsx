@@ -1,37 +1,33 @@
 import { createContext, useRef, useEffect, useState } from "react";
-import { IActivityData } from "./Interfaces/types";
+import { AppContextType, IActivityData } from "./Interfaces/types";
 import { activityBase } from "./utils/objects";
 import { checkmode, checkStatus } from "./services/minima";
 
-export const appContext = createContext({
+export const appContext = createContext<AppContextType>({
   activityData: {} as IActivityData,
-  setActivityData: (() => {}) as React.Dispatch<
-    React.SetStateAction<IActivityData>
-  >,
+  setActivityData: () => {},
   sessionStatus: false,
-  setSessionStatus: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
+  setSessionStatus: () => {},
   sessionId: "",
-  setSessionId: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  setSessionId: () => {},
   reviewId: "",
-  setReviewId: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  setReviewId: () => {},
   dataStatus: "",
-  setDataStatus: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  setDataStatus: () => {},
   blockChainStatus: "",
-  setBlockChainStatus: (() => {}) as React.Dispatch<
-    React.SetStateAction<string>
-  >,
-  activityList: [] as IActivityData[],
-  setActivityList: (() => {}) as React.Dispatch<
-    React.SetStateAction<IActivityData[]>
-  >,
+  setBlockChainStatus: () => {},
+  activityList: [],
+  setActivityList: () => {},
   showSummary: false,
-  setShowSummary: (() => {}) as React.Dispatch<React.SetStateAction<boolean>>,
+  setShowSummary: () => {},
   pendingUid: 0,
-  setPendingUid: (() => {}) as React.Dispatch<React.SetStateAction<number>>,
+  setPendingUid: () => {},
   timeConnected: "",
-  setTimeConnected: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  setTimeConnected: () => {},
   fileData: "",
-  setFileData: (() => {}) as React.Dispatch<React.SetStateAction<string>>,
+  setFileData: (() => {}) as React.Dispatch<
+    React.SetStateAction<string | ArrayBuffer>
+  >,
 });
 
 interface IProps {
@@ -45,14 +41,14 @@ const AppProvider = ({ children }: IProps) => {
   const [activityData, setActivityData] = useState<IActivityData>(activityBase);
   const [activityList, setActivityList] = useState<IActivityData[]>([]);
   const [sessionStatus, setSessionStatus] = useState(false);
-  const [sessionId, setSessionIdState] = useState("");
+  const [sessionId, setSessionIdState] = useState<string>("");
   const [reviewId, setReviewId] = useState("");
   const [dataStatus, setDataStatus] = useState("");
   const [blockChainStatus, setBlockChainStatus] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const [pendingUid, setPendingUid] = useState(0);
   const [timeConnected, setTimeConnected] = useState("");
-  const [fileData, setFileData] = useState<IActivityData>("");
+  const [fileData, setFileData] = useState<string | ArrayBuffer>("");
 
   // Update the ref whenever sessionId changes
   const setSessionId = (id: string) => {
@@ -116,6 +112,7 @@ const AppProvider = ({ children }: IProps) => {
         pendingUid,
         setPendingUid,
         timeConnected,
+        setTimeConnected,
       }}
     >
       {children}
