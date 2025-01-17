@@ -3,7 +3,8 @@ import { IActivityData } from "../Interfaces/types";
 let socket: WebSocket | null = null;
 
 export const initWebSocket = (
-  onMessage: (type: string, data: IActivityData) => void
+  onMessage: (type: string, data: IActivityData) => void,
+  setBlockChainStatus
 ): WebSocket => {
   if (socket && socket.readyState !== WebSocket.CLOSED) {
     console.log("WebSocket already initialized.");
@@ -24,13 +25,14 @@ export const initWebSocket = (
 
       switch (parsedMessage.type) {
         case "message":
-          // console.log("MESSAGE", parsedMessage.message.data);
+          console.log("MESSAGE", parsedMessage.message.data);
           onMessage("data", parsedMessage.message.data);
           break;
 
         case "uid":
-          // console.log("UID", parsedMessage.data.data);
+          console.log("UID", parsedMessage);
           onMessage("uid", parsedMessage.data.data);
+          setBlockChainStatus(`Timestamping data.`);
           break;
 
         default:

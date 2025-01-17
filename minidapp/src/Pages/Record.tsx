@@ -54,7 +54,13 @@ export const Record = () => {
     setSessionStatus(true);
     const transformedId = await generateSessionId();
     setSessionId(transformedId);
-    nodejsWebsocket("start", transformedId, setDataStatus, setActivityData);
+    nodejsWebsocket(
+      "start",
+      transformedId,
+      setDataStatus,
+      setActivityData,
+      setBlockChainStatus
+    );
   };
 
   const handleDenyToS = (e) => {
@@ -77,7 +83,8 @@ export const Record = () => {
       sessionId,
       setDataStatus,
       setActivityData,
-      setPendingUid
+      setPendingUid,
+      setBlockChainStatus
     );
   };
 

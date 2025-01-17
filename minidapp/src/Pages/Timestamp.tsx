@@ -1,26 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { initWebSocket } from "../services/websocketClient";
 import { appContext } from "../AppContext";
 
 export const Timestamp = () => {
-  const {
-    sessionStatus,
-    setSessionStatus,
-    sessionId,
-    setSessionId,
-    dataStatus,
-    setDataStatus,
-    setActivityData,
-    setActivityList,
-    showSummary,
-    setShowSummary,
-    pendingUid,
-    setPendingUid,
-    timeConnected,
-    blockChainStatus,
-    setBlockChainStatus,
-  } = useContext(appContext);
-  const [status, setStatus] = useState("Not connected");
+  const [status] = useState("Not connected");
 
   useEffect(() => {
     initWebSocket();

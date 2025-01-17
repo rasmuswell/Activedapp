@@ -7,11 +7,11 @@ export const Status = ({ set, msg }) => {
 
   useEffect(() => {
     if (pendingUid !== 0) {
-      setBlockChainStatus(`Confirm the pending transaction.`);
+      setBlockChainStatus(`Time stamping has stopped.`);
     }
   }, [pendingUid]);
 
-  //Check for accepted transactions from pending
+  // Check for accepted transactions from pending
   useEffect(() => {
     const listen = async () => {
       let confirmation = false;

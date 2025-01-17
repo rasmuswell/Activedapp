@@ -81,7 +81,6 @@ export const listenPendingTxn = (setBlockChainStatus, pendingUid) => {
     MDS.init((msg) => {
       if (msg.event == "MDS_PENDING") {
         // Extract relevant information
-        console.log(msg);
 
         // const pending = msg.data.result.pending;
         const pendinguid = msg.data.uid;

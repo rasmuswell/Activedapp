@@ -1,26 +1,33 @@
-import { IActivityData } from "../Interfaces/types";
 import { sendFullToBlockchain } from "../services/blockchain";
 import { formatData } from "./fileHandler";
 import { initWebSocket, getWebSocket } from "../services/websocketClient";
+import { saveToMDSFile } from "../services/minima";
 
 let hasConnectedOnce = false;
 let shouldReconnect = false;
 const retryDelay = 5000;
 
+const dataArray: string[] = [];
+
 export const nodejsWebsocket = (
   userCommand: "start" | "stop",
   sessionId: string,
   setDataStatus: (status: string) => void,
-  setActivityData: (data: IActivityData) => void,
+  setActivityData: (data: string) => void,
+  setBlockChainStatus,
   setPendingUid?: (number: number) => void
 ) => {
-  const handleMessage = (type, data: IActivityData) => {
+  const handleMessage = (type, data: string) => {
     if (type === "data") {
-      setDataStatus("Reading data from server.");
+      setDataStatus("Reading data from the EDR (Event Data Recorder).");
       setActivityData(data);
       formatData(sessionId, data);
     } else if (type === "uid") {
-      console.log("UID: ", data);
+      console.log(data);
+
+      const filename = `${sessionId}_uids.md`;
+      dataArray.push(data);
+      saveToMDSFile(filename, dataArray);
     }
   };
 
@@ -32,31 +39,33 @@ export const nodejsWebsocket = (
   const connect = () => {
     if (!shouldReconnect) return;
 
-    const socket: WebSocket = initWebSocket(handleMessage);
+    const socket: WebSocket = initWebSocket(handleMessage, setBlockChainStatus);
 
     socket.onopen = () => {
-      console.log("Connected to the WebSocket server");
-      setDataStatus("Connected to the WebSocket server");
+      console.log("Connected to the EDR (Event Data Recorder)");
+      setDataStatus("Connected to the EDR (Event Data Recorder)");
       hasConnectedOnce = true;
       socket.send(JSON.stringify({ type: "start", id: sessionId }));
     };
 
     socket.onclose = () => {
       if (!shouldReconnect) {
-        console.log("WebSocket closed intentionally, no reconnection.");
+        console.log(
+          "EDR (Event Data Recorder) closed intentionally, no reconnection."
+        );
         return;
       }
       if (hasConnectedOnce) {
-        setDataStatus("Disconnected from the WebSocket server");
+        setDataStatus("Disconnected from the EDR (Event Data Recorder)");
         retryConnection();
       }
     };
 
     socket.onerror = () => {
-      console.error("WebSocket error: Could not connect to the server");
+      console.error("EDR (Event Data Recorder) error: Could not connect.");
       if (!hasConnectedOnce) {
         setDataStatus(
-          `Failed to connect to the WebSocket server, retrying in ${
+          `Failed to connect to the EDR (Event Data Recorder), retrying in ${
             retryDelay / 1000
           } seconds...`
         );
@@ -75,14 +84,15 @@ export const nodejsWebsocket = (
     shouldReconnect = false;
     const socket = getWebSocket();
     if (socket && socket.readyState === WebSocket.OPEN) {
-      console.log("Stopping WebSocket connection...");
+      console.log("Stopping EDR (Event Data Recorder) connection...");
       sendFullToBlockchain(sessionId, setPendingUid);
       socket.send(JSON.stringify({ type: "stop", id: sessionId }));
       socket.close();
-      setDataStatus("WebSocket connection stopped.");
+      setDataStatus("EDR (Event Data Recorder) connection stopped.");
+      setBlockChainStatus("Timestamping stopped.");
     } else {
-      console.log("No active WebSocket connection to stop.");
-      setDataStatus("No active WebSocket connection to stop.");
+      console.log("No active EDR (Event Data Recorder) connection to stop.");
+      setDataStatus("No active EDR (Event Data Recorder) connection to stop.");
     }
   } else if (userCommand === "mysql") {
     console.log("mysql start");

@@ -10,7 +10,7 @@ export const TerminateRecording = ({ dataStatus }) => {
         The data will be hashed and written to the blockchain. Please accept the
         pending transaction.
       </p>
-      <p className="text-center text-[white] p-2">Status: {dataStatus}</p>
+      {/* <p className="text-center text-[white] p-2">Status: {dataStatus}</p> */}
     </div>
   );
 };

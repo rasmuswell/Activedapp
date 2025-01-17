@@ -22,5 +22,5 @@ export const sendFullToBlockchain = async (sessionId, setPendingUid) => {
   const response = await sendData(hashedData);
 
   setPendingUid(response.pendinguid);
-  console.log(response.pendinguid);
+  // console.log(response.pendinguid);
 };

@@ -29,7 +29,8 @@ const insertDataToDB = async (tsData) => {
     const sql = "INSERT INTO timestampdata (uid, datahash) VALUES (?, ?)";
     await connection.execute(sql, [uid, tsData]);
 
-    console.log(`Data added to DB uid: ${uid}, data: ${tsData}`);
+    // console.log(`Data added to DB uid: ${uid}, data: ${tsData}`);
+
     // Close the connection
     await connection.end();
     return uid;
@@ -38,4 +39,57 @@ const insertDataToDB = async (tsData) => {
   }
 };
 
-module.exports = { insertDataToDB };
+// Function to fetch data by UID
+const fetchDataByUid = async (uid) => {
+  try {
+    // Connect to the database
+    const connection = await mysql.createConnection({
+      host: "localhost",
+      user: "tutorial",
+      password: "secret",
+      database: "tutorial",
+      port: 3308, // Adjust port if necessary
+    });
+
+    // SQL query to select data
+    const sql = "SELECT * FROM timestampdata WHERE uid = ?";
+    const [rows] = await connection.execute(sql, [uid]);
+
+    if (rows.length === 0) {
+      // UID not found
+      return {
+        status: false,
+        uid: uid,
+        error: "UID not found",
+      };
+    } else {
+      const row = rows[0];
+      const response = {
+        status: true,
+        uid: uid,
+        data: row.datahash,
+        number: row.idtimestampdata,
+        datecreated: row.datecreated,
+      };
+
+      if (row.hasbeenadded === 0) {
+        // Not added to chain yet
+        response.onchain = false;
+      } else {
+        // Added on chain
+        response.onchain = true;
+        response.datestamped = row.datestamped;
+        response.root = row.roottreehash;
+        response.proof = row.proof;
+        response.address = "0xFFEEDD";
+      }
+
+      return response;
+    }
+  } catch (err) {
+    console.error("Database error:", err);
+    return { status: false, error: "Internal server error" };
+  }
+};
+
+module.exports = { fetchDataByUid, insertDataToDB };

@@ -2,6 +2,7 @@ import { createContext, useRef, useEffect, useState } from "react";
 import { IActivityData } from "./Interfaces/types";
 import { activityBase } from "./utils/objects";
 import { checkmode, checkStatus } from "./services/minima";
+import { log } from "console";
 
 export const appContext = createContext({
   activityData: {} as IActivityData,

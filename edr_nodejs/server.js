@@ -133,10 +133,15 @@ wss.on("connection", (ws) => {
 
       if (command.type === "mysql") {
         const response = await insertDataToDB(command.data);
-        console.log("response: ", response);
+        // console.log("response: ", response);
         broadcastData("uid", response);
       }
 
+      if (command.type === "timestampuid") {
+        const response = fetchDataByUid(command.data);
+        console.log(response);
+        broadcastData("uid", response);
+      }
       if (command.type === "start") {
         if (!isCollecting) {
           console.log("Starting data collection...");

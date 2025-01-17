@@ -5,26 +5,7 @@ import StatsChart from "../Components/StatsChart";
 import { splitDate } from "../utils/helpers";
 
 export const Monitor = () => {
-  const {
-    sessionStatus,
-    // setSessionStatus,
-    // sessionId,
-    // setSessionId,
-    // dataStatus,
-    // setDataStatus,
-    // setActivityData,
-    activityList,
-    // setActivityList,
-    // showSummary,
-    // setShowSummary,
-    // pendingUid,
-    // setPendingUid,
-    // timeConnected,
-    // blockChainStatus,
-    // setBlockChainStatus,
-  } = useContext(appContext);
-
-  console.log(activityList);
+  const { sessionStatus, activityList } = useContext(appContext);
 
   return (
     <main className="flex min-h-[calc(100vh-64px)] items-center justify-center text-white">
